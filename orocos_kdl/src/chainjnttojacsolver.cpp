@@ -20,6 +20,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "chainjnttojacsolver.hpp"
+#include <iostream>
 
 namespace KDL
 {
@@ -69,17 +70,168 @@ namespace KDL
         int k=0;
         Frame total;
         for (unsigned int i=0;i<segmentNr;i++) {
+
+
+            std::cout << "=======" << std::endl;
+            std::cout << "Segment " << i << std::endl;
+            std::cout << "=======" << std::endl;
+
             //Calculate new Frame_base_ee
             if(chain.getSegment(i).getJoint().getType()!=Joint::Fixed) {
-            	//pose of the new end-point expressed in the base
+
+
+                // total
+                std::cout << "total" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << total.M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << total.p.data[m];
+                std::cout << std::endl;
+
+                // T_tmp
+                std::cout << "T_tmp" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << T_tmp.M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << T_tmp.p.data[m];
+                std::cout << std::endl;
+
+                // q_in
+                std::cout << "q(" << i << ") = " << q_in(j) << std::endl;
+
+                // Segment pose
+                std::cout << "Segment pose" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << chain.getSegment(i).pose(q_in(j)).M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << chain.getSegment(i).pose(q_in(j)).p.data[m];
+                std::cout << std::endl;
+
+
+                std::cout << "Joint pose" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << chain.getSegment(i).getJoint().pose(q_in(j)).M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << chain.getSegment(i).getJoint().pose(q_in(j)).p.data[m];
+                std::cout << std::endl;
+
+                std::cout << "f_tip" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << chain.getSegment(i).getFrameToTipZero().M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << chain.getSegment(i).getFrameToTipZero().p.data[m];
+                std::cout << std::endl;
+
+                std::cout << "f_tip GetFrameToTip" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << chain.getSegment(i).getFrameToTip().M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << chain.getSegment(i).getFrameToTip().p.data[m];
+                std::cout << std::endl;
+
+
+                //pose of the new end-point expressed in the base
                 total = T_tmp*chain.getSegment(i).pose(q_in(j));
+
+                // total = T_tmp*chain.getSegment(i).pose(q_in(j));
+                std::cout << "total" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << total.M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << total.p.data[m];
+                std::cout << std::endl;
+
+
+
                 //changing base of new segment's twist to base frame if it is not locked
                 //t_tmp = T_tmp.M*chain.getSegment(i).twist(1.0);
                 if(!locked_joints_[j])
                     t_tmp = T_tmp.M*chain.getSegment(i).twist(q_in(j),1.0);
+
+                std::cout << "t_tmp = T_tmp.M*chain.getSegment(i).twist(q_in(j),1.0)" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << t_tmp.vel.data[m];
+                std::cout << std::endl;
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << t_tmp.rot.data[m];
+
+                std::cout << std::endl;
+
             }else{
+                // Segment pose
+                std::cout << "Segment pose" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << chain.getSegment(i).pose(0.0).M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << chain.getSegment(i).pose(0.0).p.data[m];
+                std::cout << std::endl;
+
+                std::cout << "Joint pose" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << chain.getSegment(i).getJoint().pose(0.0).M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << chain.getSegment(i).getJoint().pose(0.0).p.data[m];
+                std::cout << std::endl;
+
+                std::cout << "f_tip" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << chain.getSegment(i).getFrameToTipZero().M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << chain.getSegment(i).getFrameToTipZero().p.data[m];
+                std::cout << std::endl;
+
+                std::cout << "f_tip GetFrameToTip" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << chain.getSegment(i).getFrameToTip().M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << chain.getSegment(i).getFrameToTip().p.data[m];
+                std::cout << std::endl;
+
                 total = T_tmp*chain.getSegment(i).pose(0.0);
 
+                // total = T_tmp*chain.getSegment(i).pose(q_in(j));
+                std::cout << "total = T_tmp*chain.getSegment(i).pose(0.0)" << std::endl;
+                for (std::size_t m = 0; m < 3; ++m) {
+                    for (std::size_t n = 0; n < 3; ++n)
+                        std::cout << "\t" << total.M.data[m * 3 + n];
+                    std::cout << std::endl;
+                }
+                for (std::size_t m = 0; m < 3; ++m)
+                    std::cout << "\t" << total.p.data[m];
+                std::cout << std::endl;
             }
 
             //Changing Refpoint of all columns to new ee
@@ -93,7 +245,25 @@ namespace KDL
                 j++;
             }
 
+            // jac
+            std::cout << "jac" << std::endl;
+            for (std::size_t m = 0; m < 6; ++m) {
+                for (std::size_t n = 0; n < q_in.rows(); ++n)
+                    std::cout << "\t" << jac.data(m * q_in.rows() + n);
+                std::cout << std::endl;
+            }
+
             T_tmp = total;
+            // T_tmp
+            std::cout << "T_tmp = total" << std::endl;
+            for (std::size_t m = 0; m < 3; ++m) {
+                for (std::size_t n = 0; n < 3; ++n)
+                    std::cout << "\t" << T_tmp.M.data[m * 3 + n];
+                std::cout << std::endl;
+            }
+            for (std::size_t m = 0; m < 3; ++m)
+                std::cout << "\t" << T_tmp.p.data[m];
+            std::cout << std::endl;
         }
         return (error = E_NOERROR);
     }
