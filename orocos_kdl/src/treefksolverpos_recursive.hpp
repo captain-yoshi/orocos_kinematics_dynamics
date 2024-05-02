@@ -46,6 +46,7 @@ namespace KDL {
         const Tree tree;
         
         Frame recursiveFk(const JntArray& q_in, const SegmentMap::const_iterator& it);
+        Frame recursiveFk(const SegmentMap::const_iterator& it); // tree without any joints
     };
 
 }

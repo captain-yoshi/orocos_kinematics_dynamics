@@ -40,7 +40,10 @@ namespace KDL {
         else if(it == tree.getSegments().end()) //if the segment name is not found
          	return -2;
         else{
-			p_out = recursiveFk(q_in, it);
+            if(tree.getNrOfJoints() == 0)
+                p_out = recursiveFk(it);
+            else
+                p_out = recursiveFk(q_in, it);
         	return 0;        	
         }
     }
@@ -60,6 +63,22 @@ namespace KDL {
 			return recursiveFk(q_in, parentIt) * currentFrame;
 		}
 	}
+
+    Frame TreeFkSolverPos_recursive::recursiveFk(const SegmentMap::const_iterator& it)
+    {
+		//gets the frame for the current element (segment)
+        const TreeElementType& currentElement = it->second;
+        Frame currentFrame = GetTreeElementSegment(currentElement).pose(0.0);
+
+		SegmentMap::const_iterator rootIterator = tree.getRootSegment();
+		if(it == rootIterator){
+			return currentFrame;
+		}
+		else{
+            SegmentMap::const_iterator parentIt = GetTreeElementParent(currentElement);
+			return recursiveFk(parentIt) * currentFrame;
+		}
+    }
 
     TreeFkSolverPos_recursive::~TreeFkSolverPos_recursive()
     {
